@@ -3,18 +3,18 @@
 
 :root {
   color-scheme: light;
-  --background: #f5f9fc;
-  --background-deep: #dfeaf4;
-  --foreground: #0f1f33;
-  --muted: #607286;
-  --card: rgba(255, 255, 255, 0.7);
-  --card-strong: rgba(255, 255, 255, 0.88);
-  --primary: #0f4c81;
-  --primary-foreground: #f5f9fc;
-  --accent: #2bb7a9;
-  --accent-foreground: #03181b;
-  --border: rgba(15, 31, 51, 0.12);
-  --ring: rgba(43, 183, 169, 0.42);
+  --background: #eef3f6;
+  --background-deep: #dbe6eb;
+  --foreground: #16202b;
+  --muted: #627181;
+  --card: rgba(255, 255, 255, 0.86);
+  --card-strong: #ffffff;
+  --primary: #123d5a;
+  --primary-foreground: #ffffff;
+  --accent: #008f86;
+  --accent-foreground: #ffffff;
+  --border: rgba(22, 32, 43, 0.13);
+  --ring: rgba(0, 143, 134, 0.28);
 }
 
 .dark {
@@ -46,8 +46,10 @@ body {
   min-height: 100vh;
   direction: rtl;
   background:
-    radial-gradient(circle at top, rgba(43, 183, 169, 0.16), transparent 38%),
+    linear-gradient(rgba(18, 61, 90, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 61, 90, 0.035) 1px, transparent 1px),
     linear-gradient(180deg, var(--background), var(--background-deep));
+  background-size: 28px 28px, 28px 28px, auto;
   color: var(--foreground);
   font-family: "IBM Plex Sans Arabic", system-ui, sans-serif;
 }
@@ -66,4 +68,28 @@ textarea {
 
 #root {
   min-height: 100vh;
+}
+
+::selection {
+  background: rgba(0, 143, 134, 0.22);
+}
+
+.surface {
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: 0 16px 45px rgba(22, 32, 43, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.surface-strong {
+  border: 1px solid var(--border);
+  background: var(--card-strong);
+  box-shadow: 0 14px 34px rgba(22, 32, 43, 0.08);
+}
+
+.dark-panel {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(145deg, #10263b, #123d5a);
+  color: #f8fbfd;
+  box-shadow: 0 20px 45px rgba(18, 61, 90, 0.2);
 }

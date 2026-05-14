@@ -1,5 +1,28 @@
 import { Link, useParams } from "react-router-dom";
+import {
+  CalendarDays,
+  Database,
+  Download,
+  FileText,
+  Lock,
+  MapPinned,
+  ShieldCheck,
+} from "lucide-react";
 import { layerRepository } from "@/services/layers";
+
+const geometryLabels = {
+  point: "نقاط",
+  line: "خطوط",
+  polygon: "مضلعات",
+  raster: "Raster",
+  tabular: "جدول",
+};
+
+const licenseLabels = {
+  open: "مفتوحة",
+  internal: "داخلية",
+  private: "خاصة",
+};
 
 export function LayerDetailsPage() {
   const { slug = "" } = useParams();
@@ -7,91 +30,151 @@ export function LayerDetailsPage() {
 
   if (!layer) {
     return (
-      <section className="rounded-[2rem] border border-white/10 bg-white/8 p-8 text-slate-200 backdrop-blur-xl dark:bg-slate-950/30">
+      <section className="surface-strong rounded-lg p-8 text-slate-700 dark:text-slate-200">
         الطبقة غير موجودة.
       </section>
     );
   }
 
+  const metadataRows = [
+    { label: "المصدر", value: layer.source, icon: Database },
+    { label: "نظام الإحداثيات", value: layer.crs, icon: MapPinned },
+    { label: "عدد السجلات", value: layer.recordsCount.toLocaleString("ar"), icon: FileText },
+    { label: "حجم الملف", value: `${(layer.fileSize / 1024).toFixed(0)} KB`, icon: Download },
+    {
+      label: "آخر تحديث",
+      value: new Date(layer.updatedAt).toLocaleDateString("ar"),
+      icon: CalendarDays,
+    },
+    {
+      label: "تاريخ الإنشاء",
+      value: new Date(layer.createdAt).toLocaleDateString("ar"),
+      icon: CalendarDays,
+    },
+  ];
+
   return (
     <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
       <div className="space-y-6">
-        <div className="rounded-[2rem] border border-white/12 bg-white/8 p-7 backdrop-blur-xl dark:bg-slate-950/30">
-          <h1 className="text-3xl font-bold text-white">{layer.name}</h1>
-          <p className="mt-4 text-base leading-7 text-slate-300">
+        <div className="dark-panel overflow-hidden rounded-lg p-7">
+          <div className="flex flex-wrap gap-2 text-xs font-semibold">
+            <span className="rounded-md bg-white/12 px-3 py-1 text-cyan-50">
+              {layer.category}
+            </span>
+            <span className="rounded-md bg-white/12 px-3 py-1 text-cyan-50">
+              {geometryLabels[layer.geometryType]}
+            </span>
+            <span className="rounded-md bg-white/12 px-3 py-1 text-cyan-50">
+              {licenseLabels[layer.license]}
+            </span>
+          </div>
+          <h1 className="mt-5 text-3xl font-bold text-white md:text-4xl">
+            {layer.name}
+          </h1>
+          <p className="mt-4 max-w-4xl text-base leading-8 text-slate-200">
             {layer.description}
           </p>
         </div>
-        <div className="rounded-[2rem] border border-white/12 bg-white/8 p-7 backdrop-blur-xl dark:bg-slate-950/30">
-          <h2 className="text-xl font-semibold text-white">ملخص البيانات</h2>
+
+        <div className="surface-strong rounded-lg p-7">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-xl font-semibold text-slate-950 dark:text-white">
+              ملخص البيانات
+            </h2>
+            <span className="rounded-md bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700 dark:bg-teal-400/10 dark:text-teal-200">
+              {layer.isPublic ? "متاحة للتحميل العام" : "تحميل مقيد"}
+            </span>
+          </div>
           <dl className="mt-5 grid gap-4 sm:grid-cols-2">
-            <div>
-              <dt className="text-sm text-slate-400">المصدر</dt>
-              <dd className="mt-1 text-white">{layer.source}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-slate-400">CRS</dt>
-              <dd className="mt-1 text-white">{layer.crs}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-slate-400">عدد السجلات</dt>
-              <dd className="mt-1 text-white">{layer.recordsCount}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-slate-400">حجم الملف</dt>
-              <dd className="mt-1 text-white">
-                {(layer.fileSize / 1024).toFixed(0)} KB
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm text-slate-400">آخر تحديث</dt>
-              <dd className="mt-1 text-white">
-                {new Date(layer.updatedAt).toLocaleDateString("ar")}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm text-slate-400">تاريخ الإنشاء</dt>
-              <dd className="mt-1 text-white">
-                {new Date(layer.createdAt).toLocaleDateString("ar")}
-              </dd>
-            </div>
+            {metadataRows.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <div
+                  key={item.label}
+                  className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/5"
+                >
+                  <dt className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                    <Icon className="size-4 text-teal-600 dark:text-teal-300" />
+                    {item.label}
+                  </dt>
+                  <dd className="mt-2 font-semibold text-slate-950 dark:text-white">
+                    {item.value}
+                  </dd>
+                </div>
+              );
+            })}
           </dl>
+        </div>
+
+        <div className="surface-strong rounded-lg p-7">
+          <h2 className="text-xl font-semibold text-slate-950 dark:text-white">
+            الجودة والملاحظات
+          </h2>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/5">
+              <div className="flex items-center gap-2 text-sm font-semibold text-teal-700 dark:text-teal-200">
+                <ShieldCheck className="size-4" />
+                تقرير الجودة
+              </div>
+              <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
+                {layer.qualitySummary}
+              </p>
+            </div>
+            <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/5">
+              <div className="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-slate-100">
+                <Lock className="size-4 text-teal-600 dark:text-teal-300" />
+                حقوق الاستخدام
+              </div>
+              <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
+                {layer.usageRights}
+              </p>
+            </div>
+          </div>
+          {layer.notes ? (
+            <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-7 text-amber-900 dark:border-amber-300/20 dark:bg-amber-300/10 dark:text-amber-100">
+              {layer.notes}
+            </p>
+          ) : null}
         </div>
       </div>
 
       <aside className="space-y-6">
-        <div className="rounded-[2rem] border border-white/12 bg-slate-950/45 p-6 backdrop-blur-xl">
-          <h2 className="text-xl font-semibold text-white">التحميل والمعاينة</h2>
-          <p className="mt-3 text-sm leading-6 text-slate-300">
+        <div className="surface-strong sticky top-24 rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-slate-950 dark:text-white">
+            التحميل والمعاينة
+          </h2>
+          <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
             الصيغ المتاحة: {layer.availableFormats.join("، ")}
           </p>
-          <p className="mt-3 text-sm leading-6 text-slate-300">
-            {layer.qualitySummary}
-          </p>
-          <p className="mt-3 text-sm leading-6 text-slate-300">
-            {layer.usageRights}
-          </p>
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className="mt-5 space-y-3">
             <Link
-              className="rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950"
+              className="flex items-center justify-center gap-2 rounded-md bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-cyan-300 dark:text-slate-950"
               to={`/map?layer=${layer.slug}`}
             >
+              <MapPinned className="size-4" />
               فتح على الخريطة
             </Link>
             <a
-              className="rounded-full border border-white/12 px-4 py-2 text-sm text-white"
+              className="flex items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-teal-300 hover:text-teal-700 dark:border-white/10 dark:bg-white/5 dark:text-white"
               href={layer.previewGeoJsonUrl}
             >
+              <Download className="size-4" />
               تحميل GeoJSON
             </a>
             {layer.availableFormats.includes("CSV") ? (
               <a
-                className="rounded-full border border-white/12 px-4 py-2 text-sm text-white"
+                className="flex items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-teal-300 hover:text-teal-700 dark:border-white/10 dark:bg-white/5 dark:text-white"
                 href={`/data/${layer.slug}.csv`}
               >
+                <FileText className="size-4" />
                 تحميل CSV
               </a>
             ) : null}
+          </div>
+          <div className="mt-5 rounded-lg bg-slate-50 p-4 text-xs leading-6 text-slate-500 dark:bg-white/5 dark:text-slate-400">
+            يتم إخفاء أو تقييد الملفات الخاصة عند ربط Supabase/RLS حسب دور
+            المستخدم.
           </div>
         </div>
       </aside>

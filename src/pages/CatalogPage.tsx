@@ -25,12 +25,17 @@ export function CatalogPage() {
 
   return (
     <section className="space-y-6">
-      <div className="space-y-3">
-        <h1 className="text-3xl font-bold text-white">مكتبة البيانات</h1>
-        <p className="max-w-3xl text-base leading-7 text-slate-300">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-slate-200 pb-5">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold text-slate-950">مكتبة البيانات</h1>
+          <p className="max-w-3xl text-base leading-7 text-slate-600">
           استعرض الطبقات الجغرافية، صفّها حسب النوع والمصدر، وافتح التفاصيل أو
           المعاينة على الخريطة.
-        </p>
+          </p>
+        </div>
+        <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 shadow-sm">
+          {visibleLayers.length} طبقات متاحة
+        </div>
       </div>
 
       <CatalogFilters value={filters} onChange={setFilters} />

@@ -1,106 +1,190 @@
 import { Link } from "react-router-dom";
+import {
+  ArrowLeft,
+  Database,
+  Download,
+  FileCheck2,
+  Layers3,
+  Map,
+  ShieldCheck,
+} from "lucide-react";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { StatCard } from "@/components/shared/StatCard";
+import { demoLayerDetails } from "@/data/demo/layerDetails";
 import { demoLayers } from "@/data/demo/layers";
 
 const stats = [
   {
     value: `${demoLayers.length}`,
     label: "طبقات منشورة",
-    hint: "طبقات جاهزة للاستعراض أو التنزيل العام.",
+    hint: "طبقات جاهزة للاستعراض أو التنزيل حسب الصلاحيات.",
   },
   {
     value: "17",
-    label: "تصنيفًا أساسيًا",
-    hint: "بنية مرنة لحدود، طرق، مرافق، ومسوح ميدانية.",
+    label: "تصنيفًا",
+    hint: "بنية مناسبة لبيانات البلديات والبنية التحتية.",
   },
   {
-    value: "9",
-    label: "ملفات قابلة للتنزيل",
-    hint: "تنزيلات محكومة بحسب الترخيص والصلاحيات.",
+    value: "GeoJSON / CSV",
+    label: "صيغ MVP",
+    hint: "مع فحص جودة أولي قبل الحفظ.",
   },
   {
-    value: "12 مايو 2026",
-    label: "آخر تحديث",
-    hint: "مؤشر سريع لحداثة البيانات المنشورة.",
+    value: "RLS",
+    label: "نموذج أمان",
+    hint: "جاهز لسياسات Supabase وصلاحيات الأدوار.",
   },
 ];
 
-const categories = [
-  "حدود إدارية",
-  "طرق وشوارع",
-  "مرافق عامة",
-  "مدارس",
-  "مشاريع إعمار",
-  "أضرار ومسوحات ميدانية",
+const workstreams = [
+  {
+    title: "كتالوج موحد",
+    text: "فهرسة الطبقات بالمصدر، الترخيص، النوع، تاريخ التحديث، وعدد السجلات.",
+    icon: Database,
+  },
+  {
+    title: "معاينة مكانية",
+    text: "خريطة تشغيلية تدعم إظهار الطبقات وتعديل الشفافية والبحث داخل الخصائص.",
+    icon: Map,
+  },
+  {
+    title: "حوكمة وصول",
+    text: "تمييز واضح بين البيانات المفتوحة والداخلية مع مسار إداري محمي.",
+    icon: ShieldCheck,
+  },
 ];
 
 export function HomePage() {
   return (
-    <section className="space-y-10">
-      <section className="overflow-hidden rounded-[2.5rem] border border-white/14 bg-slate-950/45 p-8 shadow-2xl shadow-slate-950/20 backdrop-blur-2xl sm:p-10 lg:p-12">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)] lg:items-center">
-          <div className="space-y-6">
-            <span className="inline-flex rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-medium text-cyan-100">
-              مستودع GIS مؤسسي
+    <section className="space-y-6">
+      <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_420px]">
+        <div className="dark-panel rounded-lg p-7 sm:p-8">
+          <div className="flex flex-wrap items-center gap-3 text-sm text-slate-200">
+            <span className="inline-flex items-center gap-2 rounded-md bg-white/10 px-3 py-2">
+              <Layers3 size={16} />
+              مستودع بيانات جغرافية
             </span>
-            <div className="space-y-4">
-              <h1 className="max-w-4xl text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-                GeoData Hub
-              </h1>
-              <p className="max-w-3xl text-lg leading-8 text-slate-200">
-                منصة مركزية رسمية لتنظيم وعرض وتحميل البيانات الجغرافية، مع
-                كتالوج واضح وخريطة تفاعلية وصلاحيات وصول مناسبة للجهات
-                والمؤسسات والفرق الميدانية.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                className="rounded-full bg-cyan-400 px-6 py-3 text-base font-semibold text-slate-950 transition hover:bg-cyan-300"
-                to="/catalog"
-              >
-                استكشاف البيانات
-              </Link>
-              <Link
-                className="rounded-full border border-white/16 px-6 py-3 text-base font-medium text-white transition hover:bg-white/10"
-                to="/map"
-              >
-                فتح الخريطة
-              </Link>
-            </div>
+            <span className="inline-flex items-center gap-2 rounded-md bg-white/10 px-3 py-2">
+              <FileCheck2 size={16} />
+              نسخة MVP قابلة للنشر
+            </span>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-            {stats.map((stat) => (
-              <StatCard
-                key={stat.label}
-                hint={stat.hint}
-                label={stat.label}
-                value={stat.value}
-              />
+
+          <div className="mt-10 max-w-4xl">
+            <h1 className="text-4xl font-bold leading-tight text-white sm:text-5xl">
+              GeoData Hub
+            </h1>
+            <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-100">
+              مركز تشغيل للبيانات الجغرافية يجمع الكتالوج، الخريطة، التحميل،
+              وفحص جودة الملفات في واجهة واحدة مناسبة للفرق الهندسية والبلدية.
+            </p>
+          </div>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              className="inline-flex items-center gap-2 rounded-md bg-[var(--accent)] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#007970]"
+              to="/catalog"
+            >
+              استكشاف البيانات
+              <ArrowLeft size={17} />
+            </Link>
+            <Link
+              className="inline-flex items-center gap-2 rounded-md border border-white/20 bg-white/8 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/14"
+              to="/map"
+            >
+              فتح الخريطة
+              <Map size={17} />
+            </Link>
+          </div>
+        </div>
+
+        <div className="surface-strong rounded-lg p-5">
+          <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-4">
+            <div>
+              <h2 className="text-lg font-bold text-slate-950">مؤشر المستودع</h2>
+              <p className="mt-1 text-sm text-slate-500">حالة البيانات التجريبية</p>
+            </div>
+            <span className="rounded-md bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
+              نشط
+            </span>
+          </div>
+
+          <div className="mt-4 space-y-3">
+            {demoLayerDetails.map((layer) => (
+              <div
+                className="flex items-center justify-between gap-3 rounded-md border border-slate-200 bg-slate-50 px-3 py-3"
+                key={layer.slug}
+              >
+                <div>
+                  <div className="text-sm font-bold text-slate-900">{layer.name}</div>
+                  <div className="mt-1 text-xs text-slate-500">{layer.category}</div>
+                </div>
+                <div className="text-left">
+                  <div className="text-sm font-bold text-slate-900">
+                    {layer.recordsCount}
+                  </div>
+                  <div className="text-xs text-slate-500">سجل</div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <div className="rounded-[2rem] border border-white/12 bg-white/8 p-7 backdrop-blur-xl dark:bg-slate-950/30">
-          <SectionHeading
-            title="منصة واحدة بدل الملفات المتفرقة"
-            description="تجمع GeoData Hub الطبقات والملفات الوصفية والمصادر وحقوق الاستخدام في واجهة واحدة قابلة للبحث والمعاينة، بدل بقائها موزعة بين روابط وملفات وأجهزة منفصلة."
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {stats.map((stat) => (
+          <StatCard
+            key={stat.label}
+            hint={stat.hint}
+            label={stat.label}
+            value={stat.value}
           />
-        </div>
-        <div className="rounded-[2rem] border border-white/12 bg-slate-950/45 p-7 backdrop-blur-xl">
-          <h3 className="text-xl font-semibold text-white">تصنيفات محورية</h3>
-          <div className="mt-5 flex flex-wrap gap-3">
-            {categories.map((category) => (
-              <span
-                key={category}
-                className="rounded-full border border-white/10 bg-white/8 px-4 py-2 text-sm text-slate-200"
-              >
-                {category}
-              </span>
-            ))}
+        ))}
+      </div>
+
+      <section className="surface rounded-lg p-6">
+        <div className="grid gap-7 lg:grid-cols-[360px_minmax(0,1fr)]">
+          <SectionHeading
+            title="واجهة تشغيل وليست صفحة عرض فقط"
+            description="الصفحة الأولى تعطي صورة مباشرة عن حالة المستودع، مسارات العمل الأساسية، وأين يبدأ المستخدم: الكتالوج أو الخريطة أو الإدارة."
+          />
+          <div className="grid gap-4 md:grid-cols-3">
+            {workstreams.map((item) => {
+              const Icon = item.icon;
+              return (
+                <article className="rounded-lg border border-slate-200 bg-white p-4" key={item.title}>
+                  <span className="flex h-9 w-9 items-center justify-center rounded-md bg-slate-900 text-white">
+                    <Icon size={18} />
+                  </span>
+                  <h3 className="mt-4 text-base font-bold text-slate-950">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{item.text}</p>
+                </article>
+              );
+            })}
           </div>
+        </div>
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-[1fr_1fr]">
+        <div className="surface-strong rounded-lg p-5">
+          <div className="flex items-center gap-3">
+            <Download className="text-[var(--accent)]" size={20} />
+            <h2 className="text-lg font-bold text-slate-950">تحميل مضبوط</h2>
+          </div>
+          <p className="mt-3 text-sm leading-6 text-slate-600">
+            التنزيل مرتبط بحالة الترخيص والظهور العام، ومسار Supabase يضيف
+            سياسات RLS لمنع الاعتماد على الواجهة وحدها.
+          </p>
+        </div>
+        <div className="surface-strong rounded-lg p-5">
+          <div className="flex items-center gap-3">
+            <FileCheck2 className="text-[var(--accent)]" size={20} />
+            <h2 className="text-lg font-bold text-slate-950">فحص قبل النشر</h2>
+          </div>
+          <p className="mt-3 text-sm leading-6 text-slate-600">
+            رفع GeoJSON وCSV يمر بفحص هندسة وعدد سجلات وإحداثيات قبل محاولة
+            الحفظ أو النشر.
+          </p>
         </div>
       </section>
     </section>

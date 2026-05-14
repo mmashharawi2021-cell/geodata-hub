@@ -116,15 +116,20 @@ export function MapPage() {
 
   return (
     <section className="space-y-6">
-      <div className="space-y-3">
-        <h1 className="text-3xl font-bold text-white">الخريطة التفاعلية</h1>
-        <p className="max-w-3xl text-base leading-7 text-slate-300">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-slate-200 pb-5">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold text-slate-950">الخريطة التفاعلية</h1>
+          <p className="max-w-3xl text-base leading-7 text-slate-600">
           شغّل الطبقات المنشورة، عدّل شفافيتها، وابحث داخل خصائص المعالم
           الموجودة في المعاينة مباشرة.
-        </p>
+          </p>
+        </div>
+        <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 shadow-sm">
+          {activeLayerSlugs.length} طبقة فعالة
+        </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
+      <div className="grid gap-5 lg:grid-cols-[320px_minmax(0,1fr)]">
         <aside className="space-y-4">
           <FeatureSearchPanel
             query={searchQuery}
@@ -155,7 +160,7 @@ export function MapPage() {
             }
           />
         </aside>
-        <div className="overflow-hidden rounded-[2rem] border border-white/12 bg-slate-950/40 shadow-2xl backdrop-blur-xl">
+        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl">
           <MapView layers={mapLayers} selectedFeature={selectedFeature} />
         </div>
       </div>

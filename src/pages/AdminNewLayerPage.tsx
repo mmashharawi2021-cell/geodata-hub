@@ -3,9 +3,11 @@ import { AddLayerForm } from "@/features/admin/AddLayerForm";
 export function AdminNewLayerPage() {
   return (
     <section className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-white">إضافة طبقة جديدة</h1>
-        <p className="mt-2 max-w-3xl text-slate-300">
+      <div className="surface-strong rounded-lg p-6">
+        <h1 className="text-3xl font-bold text-slate-950 dark:text-white">
+          إضافة طبقة جديدة
+        </h1>
+        <p className="mt-2 max-w-3xl leading-7 text-slate-600 dark:text-slate-300">
           أدخل بيانات الطبقة وارفع ملف GeoJSON أو CSV. يتم فحص الملف قبل أي
           محاولة حفظ.
         </p>

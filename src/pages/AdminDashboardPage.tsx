@@ -1,22 +1,27 @@
 import { Link } from "react-router-dom";
+import { Database, Download, Layers3, Plus, ShieldCheck } from "lucide-react";
 import { demoLayerDetails } from "@/data/demo/layerDetails";
 
 const dashboardStats = [
   {
     label: "إجمالي الطبقات",
     value: `${demoLayerDetails.length}`,
+    icon: Layers3,
   },
   {
     label: "الطبقات العامة",
     value: `${demoLayerDetails.filter((layer) => layer.isPublic).length}`,
+    icon: ShieldCheck,
   },
   {
     label: "الطبقات الداخلية",
     value: `${demoLayerDetails.filter((layer) => !layer.isPublic).length}`,
+    icon: Database,
   },
   {
     label: "إجمالي السجلات",
     value: `${demoLayerDetails.reduce((sum, layer) => sum + layer.recordsCount, 0)}`,
+    icon: Download,
   },
 ];
 
@@ -25,50 +30,73 @@ export function AdminDashboardPage() {
     <section className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">لوحة الإدارة</h1>
-          <p className="mt-2 text-slate-300">
+          <h1 className="text-3xl font-bold text-slate-950 dark:text-white">
+            لوحة الإدارة
+          </h1>
+          <p className="mt-2 text-slate-600 dark:text-slate-300">
             متابعة الطبقات، الإحصاءات السريعة، والدخول إلى مسار رفع طبقة جديدة.
           </p>
         </div>
         <Link
-          className="rounded-full bg-cyan-400 px-5 py-3 font-semibold text-slate-950"
+          className="flex items-center gap-2 rounded-md bg-slate-950 px-5 py-3 font-semibold text-white transition hover:bg-slate-800 dark:bg-cyan-300 dark:text-slate-950"
           to="/admin/layers/new"
         >
+          <Plus className="size-4" />
           إضافة طبقة جديدة
         </Link>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {dashboardStats.map((stat) => (
-          <article
-            key={stat.label}
-            className="rounded-[1.75rem] border border-white/12 bg-white/8 p-5 backdrop-blur-xl dark:bg-slate-950/30"
-          >
-            <div className="text-sm text-slate-300">{stat.label}</div>
-            <div className="mt-3 text-3xl font-bold text-white">
-              {stat.value}
-            </div>
-          </article>
-        ))}
+        {dashboardStats.map((stat) => {
+          const Icon = stat.icon;
+
+          return (
+            <article key={stat.label} className="surface-strong rounded-lg p-5">
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-sm text-slate-500 dark:text-slate-400">
+                  {stat.label}
+                </div>
+                <span className="rounded-md bg-teal-50 p-2 text-teal-700 dark:bg-teal-400/10 dark:text-teal-200">
+                  <Icon className="size-5" />
+                </span>
+              </div>
+              <div className="mt-3 text-3xl font-bold text-slate-950 dark:text-white">
+                {stat.value}
+              </div>
+            </article>
+          );
+        })}
       </div>
 
-      <section className="rounded-[2rem] border border-white/12 bg-white/8 p-6 backdrop-blur-xl dark:bg-slate-950/30">
-        <h2 className="text-xl font-semibold text-white">آخر الطبقات</h2>
-        <div className="mt-4 space-y-3">
+      <section className="surface-strong rounded-lg p-6">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-xl font-semibold text-slate-950 dark:text-white">
+            آخر الطبقات
+          </h2>
+          <span className="rounded-md bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 dark:bg-white/5 dark:text-slate-300">
+            بيانات تجريبية
+          </span>
+        </div>
+        <div className="mt-5 overflow-hidden rounded-lg border border-slate-200 dark:border-white/10">
           {demoLayerDetails.map((layer) => (
             <article
               key={layer.slug}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3"
+              className="grid gap-3 border-b border-slate-200 bg-white px-4 py-4 last:border-b-0 md:grid-cols-[minmax(0,1fr)_150px_130px] dark:border-white/10 dark:bg-white/5"
             >
               <div>
-                <div className="font-medium text-white">{layer.name}</div>
-                <div className="text-sm text-slate-400">
+                <div className="font-semibold text-slate-950 dark:text-white">
+                  {layer.name}
+                </div>
+                <div className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                   {layer.category} • {layer.source}
                 </div>
               </div>
-              <div className="text-sm text-slate-300">
+              <div className="text-sm text-slate-600 dark:text-slate-300">
                 {new Date(layer.updatedAt).toLocaleDateString("ar")}
               </div>
+              <span className="w-fit rounded-md bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 dark:bg-white/5 dark:text-slate-300">
+                {layer.isPublic ? "عام" : "مقيد"}
+              </span>
             </article>
           ))}
         </div>

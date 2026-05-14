@@ -17,27 +17,27 @@ export function FeatureSearchPanel({
   onSelectResult: (result: MapSearchResult) => void;
 }) {
   return (
-    <section className="rounded-[1.75rem] border border-white/12 bg-white/8 p-4 backdrop-blur-xl dark:bg-slate-950/30">
-      <h2 className="text-lg font-semibold text-white">بحث داخل الخريطة</h2>
+    <section className="surface-strong rounded-lg p-4">
+      <h2 className="text-base font-bold text-slate-950">بحث داخل الخريطة</h2>
       <input
-        className="mt-4 w-full rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-400"
+        className="mt-3 w-full rounded-md border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 shadow-sm outline-none placeholder:text-slate-400 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--ring)]"
         placeholder="ابحث باسم معلم أو قيمة حقل"
         value={query}
         onChange={(event) => onQueryChange(event.target.value)}
       />
       <div className="mt-4 space-y-2">
         {results.length === 0 && query ? (
-          <p className="text-sm text-slate-400">لا توجد نتائج مطابقة.</p>
+          <p className="text-sm text-slate-500">لا توجد نتائج مطابقة.</p>
         ) : null}
         {results.slice(0, 6).map((result) => (
           <button
             key={result.id}
-            className="w-full rounded-2xl border border-white/10 bg-white/8 px-4 py-3 text-right text-sm text-slate-100 transition hover:bg-white/12"
+            className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2.5 text-right text-sm text-slate-800 transition hover:bg-slate-100"
             type="button"
             onClick={() => onSelectResult(result)}
           >
             <div className="font-medium">{result.title}</div>
-            <div className="mt-1 text-xs text-slate-400">{result.layerName}</div>
+            <div className="mt-1 text-xs text-slate-500">{result.layerName}</div>
           </button>
         ))}
       </div>
