@@ -10,6 +10,27 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("maplibre-gl")) {
+            return "maplibre";
+          }
+
+          if (
+            id.includes("react-dom") ||
+            id.includes("react-router-dom") ||
+            /[/\\]react[/\\]/.test(id)
+          ) {
+            return "vendor";
+          }
+
+          return undefined;
+        },
+      },
+    },
+  },
   test: {
     environment: "jsdom",
     setupFiles: "./src/tests/setup.ts",

@@ -1,0 +1,40 @@
+import type { LayerListItem } from "@/types/layers";
+
+export const demoLayers: LayerListItem[] = [
+  {
+    id: "districts",
+    name: "حدود الأحياء",
+    slug: "districts",
+    category: "حدود إدارية",
+    source: "البلدية",
+    geometryType: "polygon",
+    license: "open",
+    isPublic: true,
+    updatedAt: "2026-05-10T00:00:00Z",
+    downloadsCount: 12,
+  },
+  {
+    id: "schools",
+    name: "المدارس",
+    slug: "schools",
+    category: "مدارس",
+    source: "وزارة التربية",
+    geometryType: "point",
+    license: "internal",
+    isPublic: false,
+    updatedAt: "2026-05-12T00:00:00Z",
+    downloadsCount: 8,
+  },
+  {
+    id: "roads",
+    name: "الطرق الرئيسية",
+    slug: "roads",
+    category: "طرق وشوارع",
+    source: "دائرة الأشغال",
+    geometryType: "line",
+    license: "open",
+    isPublic: true,
+    updatedAt: "2026-05-11T00:00:00Z",
+    downloadsCount: 18,
+  },
+];

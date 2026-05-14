@@ -1,0 +1,19 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "شارع البحر"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [34.446, 31.514],
+          [34.469, 31.523],
+          [34.481, 31.528]
+        ]
+      }
+    }
+  ]
+}

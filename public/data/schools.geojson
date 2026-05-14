@@ -1,0 +1,25 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "مدرسة الزيتون"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [34.458, 31.528]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "مدرسة الرمال"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [34.472, 31.524]
+      }
+    }
+  ]
+}
