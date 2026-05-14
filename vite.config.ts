@@ -18,6 +18,10 @@ export default defineConfig({
             return "maplibre";
           }
 
+          if (id.includes("echarts")) {
+            return "charts";
+          }
+
           if (
             id.includes("react-dom") ||
             id.includes("react-router-dom") ||

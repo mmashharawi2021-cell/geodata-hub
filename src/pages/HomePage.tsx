@@ -8,6 +8,7 @@ import {
   Map,
   ShieldCheck,
 } from "lucide-react";
+import { AnimatedPage } from "@/components/shared/AnimatedPage";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { StatCard } from "@/components/shared/StatCard";
 import { demoLayerDetails } from "@/data/demo/layerDetails";
@@ -56,7 +57,7 @@ const workstreams = [
 
 export function HomePage() {
   return (
-    <section className="space-y-6">
+    <AnimatedPage className="space-y-6">
       <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_420px]">
         <div className="dark-panel rounded-lg p-7 sm:p-8">
           <div className="flex flex-wrap items-center gap-3 text-sm text-slate-200">
@@ -187,6 +188,6 @@ export function HomePage() {
           </p>
         </div>
       </section>
-    </section>
+    </AnimatedPage>
   );
 }

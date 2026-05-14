@@ -17,6 +17,17 @@ npm run lint
 npm run build
 ```
 
+## مكتبات الواجهة المعتمدة
+
+- Tailwind CSS: نظام التصميم الأساسي، RTL، Responsive، وDark/Light Mode.
+- Framer Motion: انتقالات خفيفة على مستوى الصفحات بدون إبطاء الخريطة.
+- ECharts: رسوم تحليلية داخل لوحة الإدارة للطبقات والسجلات والتراخيص.
+- Lucide React: الأيقونات الأساسية للخرائط والطبقات والإدارة.
+- Fontsource Cairo: خط عربي محلي عبر npm بدل الاعتماد على تحميل خارجي من Google Fonts.
+- Theme Provider مخصص: زر تبديل Dark/Light Mode محفوظ محليًا في المتصفح.
+
+تم استبعاد Bootstrap وMUI وChakra وAnt Design من هذه النسخة لأن جمعها مع Tailwind يسبب تضاربًا بصريًا وحجمًا زائدًا. يمكن إضافة Ant Design لاحقًا فقط إذا تحولت لوحة الإدارة إلى نظام جداول وعمليات مؤسسية أكبر.
+
 ## إعداد Supabase
 
 1. أنشئ مشروع Supabase مجاني.

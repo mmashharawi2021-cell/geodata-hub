@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { Database, Download, Layers3, Plus, ShieldCheck } from "lucide-react";
+import { AnimatedPage } from "@/components/shared/AnimatedPage";
 import { demoLayerDetails } from "@/data/demo/layerDetails";
+import { LayerAnalyticsChart } from "@/features/admin/LayerAnalyticsChart";
 
 const dashboardStats = [
   {
@@ -27,7 +29,7 @@ const dashboardStats = [
 
 export function AdminDashboardPage() {
   return (
-    <section className="space-y-6">
+    <AnimatedPage className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-950 dark:text-white">
@@ -69,6 +71,25 @@ export function AdminDashboardPage() {
       </div>
 
       <section className="surface-strong rounded-lg p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-semibold text-slate-950 dark:text-white">
+              تحليل سريع للطبقات
+            </h2>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+              ECharts يعرض توزيع السجلات وحالة الترخيص دون تحميل مكتبة UI ضخمة.
+            </p>
+          </div>
+          <span className="rounded-md bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700 dark:bg-teal-400/10 dark:text-teal-200">
+            ECharts
+          </span>
+        </div>
+        <div className="mt-4">
+          <LayerAnalyticsChart layers={demoLayerDetails} />
+        </div>
+      </section>
+
+      <section className="surface-strong rounded-lg p-6">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-xl font-semibold text-slate-950 dark:text-white">
             آخر الطبقات
@@ -101,6 +122,6 @@ export function AdminDashboardPage() {
           ))}
         </div>
       </section>
-    </section>
+    </AnimatedPage>
   );
 }

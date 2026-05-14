@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap");
+@import "@fontsource-variable/cairo";
 @import "tailwindcss";
 
 :root {
@@ -51,7 +51,7 @@ body {
     linear-gradient(180deg, var(--background), var(--background-deep));
   background-size: 28px 28px, 28px 28px, auto;
   color: var(--foreground);
-  font-family: "IBM Plex Sans Arabic", system-ui, sans-serif;
+  font-family: "Cairo Variable", system-ui, sans-serif;
 }
 
 a {
