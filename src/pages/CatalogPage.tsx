@@ -18,6 +18,13 @@ const initialFilters: LayerFilterState = {
 export function CatalogPage() {
   const [filters, setFilters] = useState(initialFilters);
   const layers = layerRepository.listPublicLayers();
+  const categories = useMemo(
+    () =>
+      [...new Set(layers.map((layer) => layer.category))].sort((a, b) =>
+        a.localeCompare(b, "ar"),
+      ),
+    [layers],
+  );
   const visibleLayers = useMemo(
     () => applyLayerFilters(layers, filters),
     [filters, layers],
@@ -29,8 +36,8 @@ export function CatalogPage() {
         <div className="space-y-2">
           <h1 className="text-3xl font-bold text-slate-950">مكتبة البيانات</h1>
           <p className="max-w-3xl text-base leading-7 text-slate-600">
-          استعرض الطبقات الجغرافية، صفّها حسب النوع والمصدر، وافتح التفاصيل أو
-          المعاينة على الخريطة.
+          استعرض الطبقات الجغرافية ومصادر البيانات المفتوحة، صفّها حسب النوع
+          والمصدر، وافتح التفاصيل أو رابط التحميل الرسمي.
           </p>
         </div>
         <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 shadow-sm">
@@ -38,7 +45,11 @@ export function CatalogPage() {
         </div>
       </div>
 
-      <CatalogFilters value={filters} onChange={setFilters} />
+      <CatalogFilters
+        categories={categories}
+        value={filters}
+        onChange={setFilters}
+      />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {visibleLayers.map((layer) => (

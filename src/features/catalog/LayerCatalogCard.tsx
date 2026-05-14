@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, Download, Eye, Lock, MapPinned } from "lucide-react";
+import { ArrowLeft, Download, ExternalLink, Eye, Lock, MapPinned } from "lucide-react";
 import type { LayerListItem } from "@/types/layers";
 
 const geometryLabels = {
@@ -17,6 +17,12 @@ const licenseLabels = {
 } as const;
 
 export function LayerCatalogCard({ layer }: { layer: LayerListItem }) {
+  const canPreview =
+    layer.isPreviewable !== false &&
+    layer.geometryType !== "raster" &&
+    layer.geometryType !== "tabular";
+  const isDownloadable = layer.isDownloadable !== false;
+
   return (
     <article className="surface-strong rounded-lg p-4 transition hover:-translate-y-0.5 hover:shadow-xl">
       <div className="flex items-start justify-between gap-4">
@@ -28,6 +34,11 @@ export function LayerCatalogCard({ layer }: { layer: LayerListItem }) {
             </span>
           </div>
           <p className="mt-1 text-sm font-medium text-slate-500">{layer.category}</p>
+          {layer.coverage ? (
+            <p className="mt-2 text-xs font-semibold text-teal-700">
+              التغطية: {layer.coverage}
+            </p>
+          ) : null}
         </div>
         {layer.isPublic ? (
           <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-1 text-xs font-bold text-emerald-700">
@@ -45,7 +56,21 @@ export function LayerCatalogCard({ layer }: { layer: LayerListItem }) {
       <dl className="mt-4 grid gap-2 border-y border-slate-100 py-4 text-sm">
         <div className="flex items-center justify-between gap-4">
           <dt className="text-slate-500">المصدر</dt>
-          <dd className="font-semibold text-slate-800">{layer.source}</dd>
+          <dd className="text-left font-semibold text-slate-800">
+            {layer.sourceUrl ? (
+              <a
+                className="inline-flex items-center gap-1 hover:text-teal-700"
+                href={layer.sourceUrl}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {layer.source}
+                <ExternalLink size={13} />
+              </a>
+            ) : (
+              layer.source
+            )}
+          </dd>
         </div>
         <div className="flex items-center justify-between gap-4">
           <dt className="text-slate-500">الترخيص</dt>
@@ -57,6 +82,14 @@ export function LayerCatalogCard({ layer }: { layer: LayerListItem }) {
             {new Date(layer.updatedAt).toLocaleDateString("ar")}
           </dd>
         </div>
+        {layer.recordsCountLabel ? (
+          <div className="flex items-center justify-between gap-4">
+            <dt className="text-slate-500">السجلات</dt>
+            <dd className="text-left font-semibold text-slate-800">
+              {layer.recordsCountLabel}
+            </dd>
+          </div>
+        ) : null}
       </dl>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -67,21 +100,35 @@ export function LayerCatalogCard({ layer }: { layer: LayerListItem }) {
           تفاصيل
           <ArrowLeft size={15} />
         </Link>
-        <Link
-          className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700"
-          to={`/map?layer=${layer.slug}`}
-        >
-          <MapPinned size={15} />
-          معاينة
-        </Link>
-        {layer.isPublic ? (
+        {canPreview ? (
           <Link
             className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700"
-            to={`/layers/${layer.slug}`}
+            to={`/map?layer=${layer.slug}`}
           >
-            <Download size={15} />
-            تحميل
+            <MapPinned size={15} />
+            معاينة
           </Link>
+        ) : null}
+        {layer.isPublic && isDownloadable ? (
+          layer.downloadUrl ? (
+            <a
+              className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700"
+              href={layer.downloadUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              <Download size={15} />
+              المصدر/التحميل
+            </a>
+          ) : (
+            <Link
+              className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700"
+              to={`/layers/${layer.slug}`}
+            >
+              <Download size={15} />
+              تحميل
+            </Link>
+          )
         ) : null}
       </div>
     </article>

@@ -17,9 +17,14 @@ export function applyLayerFilters(
   const filtered = layers.filter((layer) => {
     const matchesQuery =
       normalizedQuery === "" ||
-      [layer.name, layer.category, layer.source].some((value) =>
-        value.toLowerCase().includes(normalizedQuery),
-      );
+      [
+        layer.name,
+        layer.category,
+        layer.source,
+        layer.coverage,
+        layer.description,
+        ...(layer.tags ?? []),
+      ].some((value) => value?.toLowerCase().includes(normalizedQuery));
     const matchesCategory =
       filters.category === "all" || layer.category === filters.category;
     const matchesGeometry =

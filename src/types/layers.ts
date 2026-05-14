@@ -6,6 +6,7 @@ export interface LayerListItem {
   id: string;
   name: string;
   slug: string;
+  description?: string;
   category: string;
   source: string;
   geometryType: LayerGeometryType;
@@ -13,6 +14,16 @@ export interface LayerListItem {
   isPublic: boolean;
   updatedAt: string;
   downloadsCount: number;
+  coverage?: string;
+  dataAccessType?: "external" | "local" | "supabase";
+  downloadUrl?: string;
+  isDownloadable?: boolean;
+  isPreviewable?: boolean;
+  licenseUrl?: string;
+  recordsCountLabel?: string;
+  sourceUrl?: string;
+  tags?: string[];
+  updateFrequency?: string;
 }
 
 export interface LayerDetails extends LayerListItem {
@@ -20,8 +31,9 @@ export interface LayerDetails extends LayerListItem {
   crs: string;
   createdAt: string;
   fileSize: number;
+  fileSizeLabel?: string;
   recordsCount: number;
-  previewGeoJsonUrl: string;
+  previewGeoJsonUrl?: string;
   availableFormats: string[];
   qualitySummary: string;
   usageRights: string;

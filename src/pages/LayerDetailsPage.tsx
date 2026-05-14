@@ -3,6 +3,7 @@ import {
   CalendarDays,
   Database,
   Download,
+  ExternalLink,
   FileText,
   Lock,
   MapPinned,
@@ -39,8 +40,28 @@ export function LayerDetailsPage() {
   const metadataRows = [
     { label: "المصدر", value: layer.source, icon: Database },
     { label: "نظام الإحداثيات", value: layer.crs, icon: MapPinned },
-    { label: "عدد السجلات", value: layer.recordsCount.toLocaleString("ar"), icon: FileText },
-    { label: "حجم الملف", value: `${(layer.fileSize / 1024).toFixed(0)} KB`, icon: Download },
+    {
+      label: "عدد السجلات",
+      value: layer.recordsCountLabel ?? layer.recordsCount.toLocaleString("ar"),
+      icon: FileText,
+    },
+    {
+      label: "حجم الملف",
+      value: layer.fileSizeLabel ?? `${(layer.fileSize / 1024).toFixed(0)} KB`,
+      icon: Download,
+    },
+    ...(layer.coverage
+      ? [{ label: "التغطية", value: layer.coverage, icon: MapPinned }]
+      : []),
+    ...(layer.updateFrequency
+      ? [
+          {
+            label: "وتيرة التحديث",
+            value: layer.updateFrequency,
+            icon: CalendarDays,
+          },
+        ]
+      : []),
     {
       label: "آخر تحديث",
       value: new Date(layer.updatedAt).toLocaleDateString("ar"),
@@ -148,27 +169,54 @@ export function LayerDetailsPage() {
             الصيغ المتاحة: {layer.availableFormats.join("، ")}
           </p>
           <div className="mt-5 space-y-3">
-            <Link
-              className="flex items-center justify-center gap-2 rounded-md bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-cyan-300 dark:text-slate-950"
-              to={`/map?layer=${layer.slug}`}
-            >
-              <MapPinned className="size-4" />
-              فتح على الخريطة
-            </Link>
-            <a
-              className="flex items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-teal-300 hover:text-teal-700 dark:border-white/10 dark:bg-white/5 dark:text-white"
-              href={layer.previewGeoJsonUrl}
-            >
-              <Download className="size-4" />
-              تحميل GeoJSON
-            </a>
-            {layer.availableFormats.includes("CSV") ? (
+            {layer.isPreviewable !== false && layer.previewGeoJsonUrl ? (
+              <>
+                <Link
+                  className="flex items-center justify-center gap-2 rounded-md bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-cyan-300 dark:text-slate-950"
+                  to={`/map?layer=${layer.slug}`}
+                >
+                  <MapPinned className="size-4" />
+                  فتح على الخريطة
+                </Link>
+                <a
+                  className="flex items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-teal-300 hover:text-teal-700 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                  href={layer.previewGeoJsonUrl}
+                >
+                  <Download className="size-4" />
+                  تحميل GeoJSON
+                </a>
+              </>
+            ) : null}
+            {layer.dataAccessType === "local" &&
+            layer.availableFormats.includes("CSV") ? (
               <a
                 className="flex items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-teal-300 hover:text-teal-700 dark:border-white/10 dark:bg-white/5 dark:text-white"
                 href={`/data/${layer.slug}.csv`}
               >
                 <FileText className="size-4" />
                 تحميل CSV
+              </a>
+            ) : null}
+            {layer.downloadUrl ? (
+              <a
+                className="flex items-center justify-center gap-2 rounded-md bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#007970]"
+                href={layer.downloadUrl}
+                rel="noreferrer"
+                target="_blank"
+              >
+                <ExternalLink className="size-4" />
+                فتح المصدر الرسمي
+              </a>
+            ) : null}
+            {layer.licenseUrl ? (
+              <a
+                className="flex items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:border-teal-300 hover:text-teal-700 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                href={layer.licenseUrl}
+                rel="noreferrer"
+                target="_blank"
+              >
+                <ShieldCheck className="size-4" />
+                مراجعة الترخيص
               </a>
             ) : null}
           </div>

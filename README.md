@@ -28,6 +28,16 @@ npm run build
 
 تم استبعاد Bootstrap وMUI وChakra وAnt Design من هذه النسخة لأن جمعها مع Tailwind يسبب تضاربًا بصريًا وحجمًا زائدًا. يمكن إضافة Ant Design لاحقًا فقط إذا تحولت لوحة الإدارة إلى نظام جداول وعمليات مؤسسية أكبر.
 
+## البيانات المفتوحة
+
+تم دمج كتالوج مصادر مفتوحة موثقة داخل التطبيق، يشمل Natural Earth وOpenStreetMap/Geofabrik وHDX وWorldPop وUSGS وNASA Earthdata وCopernicus وOpenAerialMap وOurAirports وبوابة فلسطين المفتوحة. التفاصيل والسياسة موجودة في:
+
+```bash
+docs/open-data-sources.md
+```
+
+المشروع لا يخزن ملفات OSM/Raster الضخمة داخل GitHub Pages. هذه المصادر تظهر كروابط رسمية مع metadata، بينما المعاينة المباشرة على الخريطة تبقى للـ GeoJSON المحلي أو النسخ المبسطة.
+
 ## إعداد Supabase
 
 1. أنشئ مشروع Supabase مجاني.

@@ -20,7 +20,14 @@ interface SearchFeatureRecord {
 export function MapPage() {
   const [searchParams] = useSearchParams();
   const publicLayers = useMemo(
-    () => demoLayerDetails.filter((layer) => layer.isPublic),
+    () =>
+      demoLayerDetails.filter(
+        (layer) =>
+          layer.isPublic &&
+          layer.isPreviewable !== false &&
+          Boolean(layer.previewGeoJsonUrl) &&
+          ["point", "line", "polygon"].includes(layer.geometryType),
+      ),
     [],
   );
   const initialLayer =
@@ -47,7 +54,7 @@ export function MapPage() {
 
     Promise.all(
       publicLayers.map(async (layer) => {
-        const response = await fetch(layer.previewGeoJsonUrl);
+        const response = await fetch(layer.previewGeoJsonUrl!);
         const collection =
           (await response.json()) as FeatureCollection<Geometry>;
         return [layer.slug, collection] as const;

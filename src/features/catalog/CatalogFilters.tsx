@@ -7,9 +7,11 @@ const inputClass =
 export function CatalogFilters({
   value,
   onChange,
+  categories,
 }: {
   value: LayerFilterState;
   onChange: (nextValue: LayerFilterState) => void;
+  categories: string[];
 }) {
   return (
     <div className="surface rounded-lg p-4">
@@ -17,7 +19,7 @@ export function CatalogFilters({
         <SlidersHorizontal size={16} />
         أدوات البحث والفرز
       </div>
-      <div className="grid gap-3 md:grid-cols-[minmax(220px,1.4fr)_1fr_1fr_1fr]">
+      <div className="grid gap-3 md:grid-cols-[minmax(220px,1.4fr)_1fr_1fr_1fr_1fr]">
         <label className="relative">
           <Search className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
           <input
@@ -35,9 +37,11 @@ export function CatalogFilters({
           }
         >
           <option value="all">كل التصنيفات</option>
-          <option value="حدود إدارية">حدود إدارية</option>
-          <option value="مدارس">مدارس</option>
-          <option value="طرق وشوارع">طرق وشوارع</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
         </select>
         <select
           className={inputClass}
@@ -50,6 +54,20 @@ export function CatalogFilters({
           <option value="point">نقاط</option>
           <option value="line">خطوط</option>
           <option value="polygon">مضلعات</option>
+          <option value="raster">Raster</option>
+          <option value="tabular">جدولي</option>
+        </select>
+        <select
+          className={inputClass}
+          value={value.license}
+          onChange={(event) =>
+            onChange({ ...value, license: event.target.value })
+          }
+        >
+          <option value="all">كل التراخيص</option>
+          <option value="open">مفتوحة</option>
+          <option value="internal">داخلية</option>
+          <option value="private">خاصة</option>
         </select>
         <select
           className={inputClass}
