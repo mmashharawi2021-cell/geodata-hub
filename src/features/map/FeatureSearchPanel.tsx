@@ -1,3 +1,5 @@
+import { Search, MapPin } from "lucide-react";
+
 export interface MapSearchResult {
   id: string;
   layerName: string;
@@ -5,42 +7,51 @@ export interface MapSearchResult {
   properties?: Record<string, unknown>;
 }
 
+interface FeatureSearchPanelProps {
+  query: string;
+  results: MapSearchResult[];
+  onQueryChange: (value: string) => void;
+  onSelectResult: (result: MapSearchResult) => void;
+}
+
 export function FeatureSearchPanel({
   query,
   results,
   onQueryChange,
   onSelectResult,
-}: {
-  query: string;
-  results: MapSearchResult[];
-  onQueryChange: (value: string) => void;
-  onSelectResult: (result: MapSearchResult) => void;
-}) {
+}: FeatureSearchPanelProps) {
   return (
-    <section className="surface-strong rounded-lg p-4">
-      <h2 className="text-base font-bold text-slate-950">بحث داخل الخريطة</h2>
-      <input
-        className="mt-3 w-full rounded-md border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 shadow-sm outline-none placeholder:text-slate-400 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--ring)]"
-        placeholder="ابحث باسم معلم أو قيمة حقل"
-        value={query}
-        onChange={(event) => onQueryChange(event.target.value)}
-      />
-      <div className="mt-4 space-y-2">
-        {results.length === 0 && query ? (
-          <p className="text-sm text-slate-500">لا توجد نتائج مطابقة.</p>
-        ) : null}
+    <div className="space-y-3">
+      <div className="relative">
+        <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--muted)]" />
+        <input
+          type="text"
+          placeholder="ابحث عن معلم..."
+          value={query}
+          onChange={(e) => onQueryChange(e.target.value)}
+          className="input-glass pr-9 text-sm"
+        />
+      </div>
+
+      {results.length === 0 && query ? (
+        <div className="flex flex-col items-center justify-center py-10 gap-2">
+          <MapPin className="w-6 h-6 text-[var(--muted)]" />
+          <p className="text-xs text-[var(--muted)]">لا توجد نتائج</p>
+        </div>
+      ) : null}
+
+      <div className="space-y-1">
         {results.slice(0, 6).map((result) => (
           <button
             key={result.id}
-            className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2.5 text-right text-sm text-slate-800 transition hover:bg-slate-100"
-            type="button"
             onClick={() => onSelectResult(result)}
+            className="w-full glass-card rounded-xl p-3 text-right hover:border-[rgba(34,211,238,0.2)] transition-all duration-200"
           >
-            <div className="font-medium">{result.title}</div>
-            <div className="mt-1 text-xs text-slate-500">{result.layerName}</div>
+            <div className="text-xs font-bold">{result.title}</div>
+            <div className="text-[0.6rem] text-[var(--muted)] mt-0.5">{result.layerName}</div>
           </button>
         ))}
       </div>
-    </section>
+    </div>
   );
 }

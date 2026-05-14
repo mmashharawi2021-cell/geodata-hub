@@ -1,64 +1,86 @@
-import type { LayerDetails } from "@/types/layers";
+import { Eye, EyeOff } from "lucide-react";
+import type { LayerListItem } from "@/types/layers";
+import { getLayerIcon, formatLayerType } from "@/utils/layer-utils";
+
+interface LayerControlPanelProps {
+  layers: LayerListItem[];
+  activeLayers: Set<string>;
+  onLayerToggle: (layerId: string) => void;
+}
 
 export function LayerControlPanel({
   layers,
-  activeLayerSlugs,
-  opacityByLayer,
-  onToggleLayer,
-  onOpacityChange,
-}: {
-  layers: LayerDetails[];
-  activeLayerSlugs: string[];
-  opacityByLayer: Record<string, number>;
-  onToggleLayer: (slug: string) => void;
-  onOpacityChange: (slug: string, opacity: number) => void;
-}) {
-  return (
-    <section className="surface-strong rounded-lg p-4">
-      <h2 className="text-base font-bold text-slate-950">الطبقات</h2>
-      <div className="mt-4 space-y-3">
-        {layers.map((layer) => {
-          const isActive = activeLayerSlugs.includes(layer.slug);
+  activeLayers,
+  onLayerToggle,
+}: LayerControlPanelProps) {
+  if (layers.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 gap-2 text-center">
+        <EyeOff className="w-6 h-6 text-[var(--muted)]" />
+        <p className="text-xs text-[var(--muted)]">لا توجد طبقات متاحة</p>
+      </div>
+    );
+  }
 
-          return (
-            <article
-              key={layer.slug}
-              className="rounded-md border border-slate-200 bg-slate-50 p-3"
-            >
-              <label className="flex items-center justify-between gap-3">
-                <div>
-                  <div className="font-bold text-slate-900">{layer.name}</div>
-                  <div className="text-xs text-slate-500">{layer.category}</div>
-                </div>
-                <input
-                  className="accent-[var(--accent)]"
-                  checked={isActive}
-                  type="checkbox"
-                  onChange={() => onToggleLayer(layer.slug)}
-                />
-              </label>
-              <div className="mt-3">
-                <div className="mb-2 flex items-center justify-between text-xs text-slate-500">
-                  <span>الشفافية</span>
-                  <span>{Math.round((opacityByLayer[layer.slug] ?? 0.75) * 100)}%</span>
-                </div>
-                <input
-                  className="w-full accent-[var(--accent)]"
-                  disabled={!isActive}
-                  max={1}
-                  min={0.15}
-                  step={0.05}
-                  type="range"
-                  value={opacityByLayer[layer.slug] ?? 0.75}
-                  onChange={(event) =>
-                    onOpacityChange(layer.slug, Number(event.target.value))
-                  }
+  return (
+    <div className="space-y-2">
+      {layers.map((layer) => {
+        const Icon = getLayerIcon(layer.geometryType);
+        const isActive = activeLayers.has(layer.id);
+
+        return (
+          <button
+            key={layer.id}
+            onClick={() => onLayerToggle(layer.id)}
+            className={`w-full glass-card rounded-xl p-3 text-right transition-all duration-200 ${
+              isActive
+                ? "border-[rgba(34,211,238,0.3)] bg-[rgba(34,211,238,0.04)]"
+                : "opacity-70 hover:opacity-100"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                  isActive
+                    ? "bg-gradient-to-br from-[rgba(34,211,238,0.2)] to-[rgba(34,211,238,0.08)]"
+                    : "bg-[rgba(255,255,255,0.04)]"
+                }`}
+              >
+                <Icon
+                  className={`w-4 h-4 transition-colors ${
+                    isActive ? "text-[#22d3ee]" : "text-[var(--muted)]"
+                  }`}
                 />
               </div>
-            </article>
-          );
-        })}
-      </div>
-    </section>
+
+              <div className="flex-1 min-w-0 text-right">
+                <p className={`text-xs font-bold truncate ${
+                  isActive ? "text-[var(--foreground)]" : "text-[var(--muted)]"
+                }`}>
+                  {layer.name}
+                </p>
+                <span className="text-[0.6rem] text-[var(--muted)]">
+                  {formatLayerType(layer.geometryType)}
+                </span>
+              </div>
+
+              <div
+                className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
+                  isActive
+                    ? "bg-[rgba(34,211,238,0.1)] text-[#22d3ee]"
+                    : "text-[var(--muted)]"
+                }`}
+              >
+                {isActive ? (
+                  <Eye className="w-3.5 h-3.5" />
+                ) : (
+                  <EyeOff className="w-3.5 h-3.5" />
+                )}
+              </div>
+            </div>
+          </button>
+        );
+      })}
+    </div>
   );
 }

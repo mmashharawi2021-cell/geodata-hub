@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { App } from "@/App";
 import { RequireRole } from "@/features/auth/RequireRole";
 import { AppShell } from "@/components/layout/AppShell";
@@ -33,6 +33,21 @@ const AdminNewLayerPage = lazy(() =>
     default: module.AdminNewLayerPage,
   })),
 );
+const NotFoundPage = lazy(() =>
+  import("@/pages/NotFoundPage").then((module) => ({
+    default: module.NotFoundPage,
+  })),
+);
+const ArabDataPage = lazy(() =>
+  import("@/pages/ArabDataPage").then((module) => ({
+    default: module.ArabDataPage,
+  })),
+);
+const AboutOwnerPage = lazy(() =>
+  import("@/pages/AboutOwnerPage").then((module) => ({
+    default: module.AboutOwnerPage,
+  })),
+);
 
 export const router = createBrowserRouter([
   {
@@ -47,6 +62,9 @@ export const router = createBrowserRouter([
           { path: "layers/:slug", element: <LayerDetailsPage /> },
           { path: "map", element: <MapPage /> },
           { path: "login", element: <LoginPage /> },
+          { path: "arab-data", element: <ArabDataPage /> },
+          { path: "about-owner", element: <AboutOwnerPage /> },
+          { path: "layers", element: <Navigate to="/catalog" replace /> },
           {
             path: "admin",
             element: (
@@ -63,6 +81,7 @@ export const router = createBrowserRouter([
               </RequireRole>
             ),
           },
+          { path: "*", element: <NotFoundPage /> },
         ],
       },
     ],

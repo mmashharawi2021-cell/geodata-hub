@@ -1,283 +1,183 @@
-import { useEffect, useMemo, useRef } from "react";
-import type { FeatureCollection, Geometry } from "geojson";
-import maplibregl, { LngLatBounds } from "maplibre-gl";
+import { useEffect, useRef, useImperativeHandle, forwardRef, useState, useCallback } from "react";
+import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import type { LayerListItem } from "@/types/layers";
+import { AlertCircle } from "lucide-react";
 
-export interface MapLayerPayload {
-  slug: string;
-  name: string;
-  geometryType: "point" | "line" | "polygon";
-  opacity: number;
-  visible: boolean;
-  collection: FeatureCollection;
-}
-
-interface SelectedFeaturePayload {
-  id: string;
-  properties?: Record<string, unknown>;
-  geometry?: Geometry | null;
-}
-
-function buildMapLayerConfig(
-  layer: MapLayerPayload,
-  sourceId: string,
-  layerId: string,
-): Parameters<maplibregl.Map["addLayer"]>[0] {
-  if (layer.geometryType === "point") {
-    return {
-      id: layerId,
-      type: "circle",
-      source: sourceId,
-      layout: { visibility: layer.visible ? "visible" : "none" },
-      paint: {
-        "circle-color": "#2bb7a9",
-        "circle-radius": 6,
-        "circle-opacity": layer.opacity,
-        "circle-stroke-width": 1.5,
-        "circle-stroke-color": "#e8feff",
-      },
-    } as unknown as Parameters<maplibregl.Map["addLayer"]>[0];
-  }
-
-  if (layer.geometryType === "line") {
-    return {
-      id: layerId,
-      type: "line",
-      source: sourceId,
-      layout: { visibility: layer.visible ? "visible" : "none" },
-      paint: {
-        "line-color": "#4da3ff",
-        "line-width": 3,
-        "line-opacity": layer.opacity,
-      },
-    } as unknown as Parameters<maplibregl.Map["addLayer"]>[0];
-  }
-
-  return {
-    id: layerId,
-    type: "fill",
-    source: sourceId,
-    layout: { visibility: layer.visible ? "visible" : "none" },
-    paint: {
-      "fill-color": "#0f4c81",
-      "fill-opacity": layer.opacity,
-      "fill-outline-color": "#9fdaff",
+const OSM_STYLE = {
+  version: 8 as const,
+  sources: {
+    osm: {
+      type: "raster" as const,
+      tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+      tileSize: 256,
+      attribution: "© OpenStreetMap contributors",
     },
-  } as unknown as Parameters<maplibregl.Map["addLayer"]>[0];
+  },
+  layers: [
+    {
+      id: "osm",
+      type: "raster" as const,
+      source: "osm",
+    },
+  ],
+};
+
+export interface MapViewHandle {
+  flyTo: (options: { center: [number, number]; zoom?: number }) => void;
 }
 
-function getFeatureCenter(feature: SelectedFeaturePayload) {
-  const geometry = feature.geometry;
-
-  if (!geometry) {
-    return null;
-  }
-
-  if (geometry.type === "Point") {
-    return geometry.coordinates as [number, number];
-  }
-
-  if (!("coordinates" in geometry)) {
-    return null;
-  }
-
-  const bounds = new LngLatBounds();
-  const appendCoordinate = (coordinate: unknown) => {
-    if (Array.isArray(coordinate) && typeof coordinate[0] === "number") {
-      bounds.extend(coordinate as [number, number]);
-      return;
-    }
-    if (Array.isArray(coordinate)) {
-      coordinate.forEach(appendCoordinate);
-    }
-  };
-  appendCoordinate(geometry.coordinates);
-
-  if (bounds.isEmpty()) {
-    return null;
-  }
-
-  const center = bounds.getCenter();
-  return [center.lng, center.lat] as [number, number];
+interface MapViewProps {
+  layers: LayerListItem[];
+  activeLayers: Set<string>;
+  onReady: (handle: MapViewHandle) => void;
 }
 
-function formatPopupProperties(properties?: Record<string, unknown>) {
-  if (!properties) {
-    return "<div style='color:#0f1f33;font-family:IBM Plex Sans Arabic,sans-serif;'>لا توجد خصائص متاحة.</div>";
-  }
+const MapViewComponent = forwardRef<MapViewHandle, MapViewProps>(
+  ({ layers, activeLayers, onReady }, _ref) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const mapRef = useRef<maplibregl.Map | null>(null);
+    const [tileError, setTileError] = useState(false);
 
-  const rows = Object.entries(properties)
-    .map(
-      ([key, value]) =>
-        `<div style="display:flex;gap:12px;justify-content:space-between;border-bottom:1px solid rgba(15,31,51,0.08);padding:6px 0;"><strong>${key}</strong><span>${String(value)}</span></div>`,
-    )
-    .join("");
+    const handleMapError = useCallback(() => {
+      setTileError(true);
+    }, []);
 
-  return `<div dir="rtl" style="min-width:220px;color:#0f1f33;font-family:IBM Plex Sans Arabic,sans-serif;">${rows}</div>`;
-}
+    useImperativeHandle(_ref, () => ({
+      flyTo: ({ center, zoom }) => {
+        mapRef.current?.flyTo({ center, zoom });
+      },
+    }));
 
-export function MapView({
-  layers,
-  selectedFeature,
-}: {
-  layers: MapLayerPayload[];
-  selectedFeature: SelectedFeaturePayload | null;
-}) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<maplibregl.Map | null>(null);
-  const popupRef = useRef<maplibregl.Popup | null>(null);
+    useEffect(() => {
+      if (!containerRef.current || mapRef.current) return;
 
-  const visibleLayers = useMemo(
-    () => layers.filter((layer) => layer.visible),
-    [layers],
-  );
+      const map = new maplibregl.Map({
+        container: containerRef.current,
+        style: OSM_STYLE,
+        center: [17.5, 26.5],
+        zoom: 5.5,
+        attributionControl: false,
+      });
 
-  useEffect(() => {
-    if (!containerRef.current || mapRef.current) {
-      return;
-    }
+      map.addControl(new maplibregl.AttributionControl(), "bottom-left");
+      map.addControl(
+        new maplibregl.NavigationControl({ visualizePitch: true }),
+        "bottom-left",
+      );
 
-    const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
-      center: [34.466, 31.525],
-      zoom: 11,
-    });
+      map.on("load", () => {
+        mapRef.current = map;
+        onReady({
+          flyTo: ({ center, zoom }) => map.flyTo({ center, zoom }),
+        });
+      });
 
-    map.addControl(new maplibregl.NavigationControl(), "top-left");
-    map.addControl(
-      new maplibregl.GeolocateControl({
-        positionOptions: { enableHighAccuracy: true },
-        trackUserLocation: false,
-      }),
-      "top-left",
-    );
+      map.on("error", (e) => {
+        if (e?.error?.status === 404 || e?.error?.status === 403) {
+          handleMapError();
+        }
+      });
 
-    mapRef.current = map;
-    popupRef.current = new maplibregl.Popup({ closeButton: true, closeOnClick: false });
+      return () => {
+        map.remove();
+        mapRef.current = null;
+      };
+    }, [onReady, handleMapError]);
 
-    return () => {
-      popupRef.current?.remove();
-      map.remove();
-      mapRef.current = null;
-    };
-  }, []);
+    useEffect(() => {
+      const map = mapRef.current;
+      if (!map || !map.isStyleLoaded()) return;
 
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) {
-      return;
-    }
+      const currentIds = new Set(
+        map.getStyle().layers?.map((l) => l.id) ?? [],
+      );
 
-    const syncLayers = () => {
       layers.forEach((layer) => {
-        const sourceId = `${layer.slug}-source`;
-        const layerId = `${layer.slug}-layer`;
+        const sourceId = `source-${layer.id}`;
+        const layerId = `layer-${layer.id}`;
 
-        if (!map.getSource(sourceId)) {
+        if (!map.getSource(sourceId) && layer.sourceUrl) {
           map.addSource(sourceId, {
             type: "geojson",
-            data: layer.collection,
-          });
-        } else {
-          const source = map.getSource(sourceId) as maplibregl.GeoJSONSource;
-          source.setData(layer.collection);
-        }
-
-        if (!map.getLayer(layerId)) {
-          map.addLayer(buildMapLayerConfig(layer, sourceId, layerId));
-
-          map.on("click", layerId, (event) => {
-            const feature = event.features?.[0];
-            if (!feature || !popupRef.current) {
-              return;
-            }
-
-            popupRef.current
-              .setLngLat(event.lngLat)
-              .setHTML(
-                formatPopupProperties(
-                  feature.properties as Record<string, unknown> | undefined,
-                ),
-              )
-              .addTo(map);
-          });
-
-          map.on("mouseenter", layerId, () => {
-            map.getCanvas().style.cursor = "pointer";
-          });
-          map.on("mouseleave", layerId, () => {
-            map.getCanvas().style.cursor = "";
+            data: layer.sourceUrl,
           });
         }
 
-        map.setLayoutProperty(
-          layerId,
-          "visibility",
-          layer.visible ? "visible" : "none",
-        );
+        const isActive = activeLayers.has(layer.id);
 
-        if (layer.geometryType === "point") {
-          map.setPaintProperty(layerId, "circle-opacity", layer.opacity);
-        } else if (layer.geometryType === "line") {
-          map.setPaintProperty(layerId, "line-opacity", layer.opacity);
-        } else {
-          map.setPaintProperty(layerId, "fill-opacity", layer.opacity);
+        if (isActive && !currentIds.has(layerId) && map.getSource(sourceId)) {
+          map.addLayer({
+            id: layerId,
+            source: sourceId,
+            type: "fill",
+            paint: {
+              "fill-color": "#22d3ee",
+              "fill-opacity": 0.15,
+            },
+          });
+        }
+
+        if (!isActive && currentIds.has(layerId)) {
+          map.removeLayer(layerId);
         }
       });
-    };
 
-    if (map.isStyleLoaded()) {
-      syncLayers();
-      return;
-    }
+      const validLayerIds = new Set(
+        layers
+          .filter((l) => activeLayers.has(l.id))
+          .map((l) => `layer-${l.id}`),
+      );
 
-    map.once("load", syncLayers);
-  }, [layers]);
+      map.getStyle().layers?.forEach((l) => {
+        if (l.id.startsWith("layer-") && !validLayerIds.has(l.id)) {
+          try { map.removeLayer(l.id); } catch { /* already removed */ }
+        }
+      });
 
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !selectedFeature) {
-      return;
-    }
+      const activeSourceIds = new Set(
+        layers.map((l) => `source-${l.id}`),
+      );
 
-    const center = getFeatureCenter(selectedFeature);
-    if (!center) {
-      return;
-    }
-
-    map.flyTo({ center, zoom: 14, essential: true });
-    popupRef.current
-      ?.setLngLat(center)
-      .setHTML(formatPopupProperties(selectedFeature.properties))
-      .addTo(map);
-  }, [selectedFeature]);
-
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map || visibleLayers.length === 0) {
-      return;
-    }
-
-    const bounds = new LngLatBounds();
-
-    visibleLayers.forEach((layer) => {
-      layer.collection.features.forEach((feature) => {
-        const center = getFeatureCenter({
-          id: String(feature.id ?? ""),
-          properties: feature.properties ?? undefined,
-          geometry: feature.geometry,
+      const sources = map.getStyle().sources;
+      if (sources) {
+        Object.keys(sources).forEach((srcId) => {
+          if (srcId.startsWith("source-") && !activeSourceIds.has(srcId)) {
+            try { map.removeSource(srcId); } catch { /* already removed */ }
+          }
         });
-        if (center) {
-          bounds.extend(center);
-        }
-      });
-    });
+      }
+    }, [layers, activeLayers]);
 
-    if (!bounds.isEmpty()) {
-      map.fitBounds(bounds, { padding: 48, maxZoom: 13, duration: 0 });
-    }
-  }, [visibleLayers]);
+    return (
+      <div className="w-full h-full absolute inset-0 relative">
+        <div
+          ref={containerRef}
+          className="w-full h-full absolute inset-0"
+          style={{ direction: "ltr" }}
+        />
+        {tileError && (
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[var(--bg)] gap-3 p-6 text-center">
+            <AlertCircle className="w-8 h-8 text-amber-400" />
+            <p className="text-sm font-bold text-[var(--foreground)]">
+              تعذر تحميل بلاطات الخريطة
+            </p>
+            <p className="text-xs text-[var(--muted)] max-w-xs">
+              يرجى التحقق من اتصالك بالإنترنت أو المحاولة لاحقاً.
+            </p>
+            <button
+              onClick={() => { setTileError(false); mapRef.current?.resize(); }}
+              className="btn-ghost btn-sm"
+            >
+              إعادة المحاولة
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  },
+);
 
-  return <div className="h-full min-h-[540px] w-full" ref={containerRef} />;
-}
+MapViewComponent.displayName = "MapView";
+
+export const MapView = MapViewComponent;

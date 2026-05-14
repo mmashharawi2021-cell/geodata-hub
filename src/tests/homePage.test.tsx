@@ -10,9 +10,9 @@ test("renders the GeoData Hub hero section", () => {
   );
 
   expect(
-    screen.getByRole("heading", { name: /GeoData Hub/i }),
+    screen.getByRole("heading", { name: /البيانات المكانية/i }),
   ).toBeInTheDocument();
   expect(
-    screen.getByRole("link", { name: "استكشاف البيانات" }),
+    screen.getByRole("link", { name: "استعرض الكتالوج" }),
   ).toBeInTheDocument();
 });

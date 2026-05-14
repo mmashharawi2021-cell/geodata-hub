@@ -10,7 +10,7 @@ test("shows catalog filters and a layer card", async () => {
   );
 
   expect(
-    await screen.findByRole("heading", { name: "مكتبة البيانات" }),
+    await screen.findByRole("heading", { name: "الكتالوج" }),
   ).toBeInTheDocument();
   expect(await screen.findByText("حدود الأحياء")).toBeInTheDocument();
 });

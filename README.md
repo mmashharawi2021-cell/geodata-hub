@@ -66,6 +66,20 @@ npm run build
 
 ملف `vercel.json` يضبط إعادة التوجيه حتى تعمل روابط React Router المباشرة.
 
+## Project Ownership / ملكية المشروع
+
+**Designed and developed by Mohanad Anwar Khalil Almashharawi**  
+**GIS Engineer**
+
+تم التصميم والتطوير بواسطة مهند أنور خليل المشهراوي — مهندس نظم معلومات جغرافية.
+
+- البريد الإلكتروني: mmashharawi2021@gmail.com
+- GitHub: [mmashharawi2021-cell](https://github.com/mmashharawi2021-cell)
+
+جميع أعمال التصميم والتطوير الخاصة بواجهة GeoData Hub من تنفيذ مهند أنور المشهراوي، مع اعتماد مصادر بيانات مفتوحة مذكورة داخل المنصة.
+
+---
+
 ## حدود MVP
 
 - المدعوم الآن: GeoJSON وCSV مع Lat/Lng.
